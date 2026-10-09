@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đấu Trường Tri Thức IC3 Spark Level 1 - Bản Nâng Cấp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #2C3E50;
+            --light: #F8F9FA;
+            --success: #2ECC71;
+            --danger: #E74C3C;
+            --purple: #9B59B6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #1A1C2E 0%, #393E46 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .game-card {
+            background: white;
+            width: 100%;
+            max-width: 950px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            overflow: hidden;
+            border: 6px solid var(--accent);
+            position: relative;
+        }
+
+        /* Header Arena Scene */
+        .arena-header {
+            background: linear-gradient(180deg, #2980B9 0%, #6DD5FA 100%);
+            padding: 15px 20px;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .battle-stage {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 16px;
+            backdrop-filter: blur(5px);
+        }
+
+        .character-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 150px;
+        }
+
+        .avatar-img {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 38px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            animation: bounce 2s infinite alternate;
+        }
+
+        .boss-avatar {
+            animation: shake 1.5s infinite alternate;
+            background: #FFD1D1;
+        }
+
+        .hp-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid white;
+            margin-top: 6px;
+        }
+
+        .hp-fill {
+            height: 100%;
+            background: var(--success);
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        .boss-hp { background: var(--danger); }
+
+        .vs-badge {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--accent);
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #2C3E50;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item { display: flex; align-items: center; gap: 6px; }
+
+        /* Quiz Body */
+        .quiz-body {
+            padding: 25px;
+            min-height: 380px;
+        }
+
+        .question-topic {
+            display: inline-block;
+            background: #E8F8F5;
+            color: #16A085;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 19px;
+            font-weight: 800;
+            color: #2C3E50;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .option-btn {
+            background: #F8F9FA;
+            border: 3px solid #E9ECEF;
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #495057;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option-btn:hover {
+            border-color: var(--secondary);
+            background: #E8F8F5;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: #D4EDDA !important;
+            border-color: var(--success) !important;
+            color: #155724 !important;
+        }
+
+        .option-btn.wrong {
+            background: #F8D7DA !important;
+            border-color: var(--danger) !important;
+            color: #721C24 !important;
+        }
+
+        .feedback-box {
+            margin-top: 15px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            line-height: 1.4;
+        }
+
+        .next-btn {
+            margin-top: 15px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            float: right;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .next-btn:hover { background: #3BCEAC; }
+
+        /* Form & Result Screens */
+        .screen-container {
+            padding: 30px 25px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #CBD5E1;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.25);
+        }
+
+        .avatar-select {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0 25px 0;
+        }
+
+        .avatar-opt {
+            font-size: 40px;
+            padding: 12px;
+            border: 4px solid #E2E8F0;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            background: #F8FAFC;
+        }
+
+        .avatar-opt.selected {
+            border-color: var(--primary);
+            background: #FFE6E6;
+            transform: scale(1.15);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            font-size: 20px;
+            font-weight: 900;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255,107,107,0.4);
+            transition: 0.3s;
+        }
+
+        .btn-primary:hover { transform: scale(1.05); }
+
+        /* Stats Cards Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #F8FAFC;
+            border: 2px solid #E2E8F0;
+            padding: 14px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-card .val {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .stat-card .lbl {
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748B;
+        }
+
+        /* Topics breakdown table */
+        .topic-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        .topic-table th {
+            background: var(--dark);
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .topic-table td {
+            padding: 10px;
+            border-bottom: 1px solid #E2E8F0;
+            background: #FFF;
+        }
+
+        /* Leaderboard table */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .leaderboard-table th {
+            background: var(--purple);
+            color: white;
+            padding: 10px;
+        }
+
+        .leaderboard-table td {
+            padding: 10px;
+            border-bottom: 1px solid #E2E8F0;
+            text-align: center;
+        }
+
+        .badge-rank {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 12px;
+            color: white;
+        }
+
+        .rank-master { background: #F1C40F; }
+        .rank-gold { background: #3498DB; }
+        .rank-silver { background: #2ECC71; }
+        .rank-bronze { background: #95A5A6; }
+
+        @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
+        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(3deg); } 75% { transform: rotate(-3deg); } 100% { transform: rotate(0deg); } }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .game-card { border: none; box-shadow: none; max-width: 100%; }
+            .btn-action-group, .arena-header, .stats-bar { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-card">
+    <!-- MÀN HÌNH 1: NHẬP THÔNG TIN NGƯỜI CHƠI -->
+    <div id="start-screen" class="screen-container" style="text-align: center;">
+        <h1 style="font-size: 30px; color: var(--primary); margin-bottom: 8px;">🛡️ ĐẤU TRƯỜNG IC3 SPARK 1 ⚔️</h1>
+        <p style="font-size: 16px; color: #64748B; margin-bottom: 20px;">Điền thông tin của em để ghi danh vào Bảng Vàng Đấu Trường!</p>
+
+        <div style="max-width: 480px; margin: 0 auto;">
+            <div class="form-group">
+                <label for="player-name">👤 Họ và tên học sinh (*):</label>
+                <input type="text" id="player-name" class="form-control" placeholder="Ví dụ: Hồ Hoàng Thuấn" required>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <div class="form-group" style="flex: 1;">
+                    <label for="player-class">🏫 Lớp (*):</label>
+                    <input type="text" id="player-class" class="form-control" placeholder="Ví dụ: 4A1" required>
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <label for="player-school">📍 Trường học:</label>
+                    <input type="text" id="player-school" class="form-control" placeholder="Ví dụ: Tiểu học Lý Nhơn" value="Trường Tiểu Học">
+                </div>
+            </div>
+
+            <label style="display:block; font-weight:800; margin: 12px 0 6px 0; color:var(--dark); text-align:left;">🦊 Chọn nhân vật đại diện:</label>
+            <div class="avatar-select">
+                <div class="avatar-opt selected" onclick="selectAvatar(this, '🧙‍♂️')">🧙‍♂️</div>
+                <div class="avatar-opt" onclick="selectAvatar(this, '🤖')">🤖</div>
+                <div class="avatar-opt" onclick="selectAvatar(this, '🦊')">🦊</div>
+                <div class="avatar-opt" onclick="selectAvatar(this, '🦸‍♀️')">🦸‍♀️</div>
+            </div>
+
+            <button class="btn-primary" onclick="validateAndStart()"> BẮT ĐẦU THI ĐẤU!</button>
+            <div style="margin-top: 15px;">
+                <button onclick="showLeaderboardModal()" style="background:none; border:none; color:var(--purple); font-weight:800; cursor:pointer; text-decoration:underline;">🏆 Xem Bảng Xếp Hạng Lưu Điểm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH 2: GIAO DIỆN CHƠI GAME -->
+    <div id="game-screen" style="display: none;">
+        <div class="arena-header">
+            <h2 id="stage-title">Chủ đề 1: Căn bản về Công Nghệ</h2>
+            <div class="battle-stage">
+                <div class="character-box">
+                    <div class="avatar-img" id="player-avatar">🧙‍♂️</div>
+                    <span style="font-weight:bold; margin-top:4px; font-size:13px;" id="display-player-name">Học sinh</span>
+                    <div class="hp-bar"><div class="hp-fill" id="player-hp"></div></div>
+                </div>
+
+                <div class="vs-badge">VS</div>
+
+                <div class="character-box">
+                    <div class="avatar-img boss-avatar" id="boss-avatar">👾</div>
+                    <span style="font-weight:bold; margin-top:4px; font-size:13px;" id="boss-name">Bọ Máy Tính</span>
+                    <div class="hp-bar"><div class="hp-fill boss-hp" id="boss-hp"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">⭐ Điểm: <span id="score" style="color:var(--accent);">0</span></div>
+            <div class="stat-item">🔥 Combo: <span id="combo" style="color:#FF9F43;">0</span></div>
+            <div class="stat-item">⏱️ Thời gian: <span id="timer">00:00</span></div>
+            <div class="stat-item">📖 Câu: <span id="q-progress">1/20</span></div>
+        </div>
+
+        <div class="quiz-body">
+            <span class="question-topic" id="q-topic">Chủ đề 1</span>
+            <div class="question-text" id="q-text">Đang tải câu hỏi...</div>
+
+            <div class="options-grid" id="options-container"></div>
+
+            <div class="feedback-box" id="feedback-box"></div>
+            <button class="next-btn" id="next-btn" style="display:none;" onclick="nextQuestion()">Tiếp tục ➔</button>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH 3: BẢO CÁO THỐNG KÊ KẾT QUẢ VÀ TỔNG KẾT -->
+    <div id="end-screen" class="screen-container" style="display: none;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="font-size: 32px; color: var(--success);" id="end-title">🏆 PHIẾU KẾT QUẢ THI ĐẤU IC3 SPARK 🏆</h1>
+            <p style="color: #64748B; font-weight:700;">Chúc mừng em đã hoàn thành bài thi Đấu Trường Tri Thức!</p>
+        </div>
+
+        <!-- Thẻ học sinh -->
+        <div style="background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%); color: white; padding: 18px; border-radius: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-size: 45px; background: white; border-radius: 50%; padding: 8px;" id="cert-avatar">🧙‍♂️</div>
+                <div>
+                    <h2 id="cert-name" style="font-size: 22px;">Họ và Tên</h2>
+                    <p id="cert-info" style="opacity: 0.9; font-size: 14px;">Lớp: 4A1 | Trường Tiểu học Lý Nhơn</p>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <span id="cert-rank-badge" class="badge-rank rank-master" style="font-size: 14px; padding: 6px 16px;">XUẤT SẮC</span>
+            </div>
+        </div>
+
+        <!-- Thống kê tổng quan -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="val" id="stat-score">0</div>
+                <div class="lbl">TỔNG ĐIỂM</div>
+            </div>
+            <div class="stat-card">
+                <div class="val" id="stat-accuracy" style="color:var(--secondary);">0%</div>
+                <div class="lbl">TỶ LỆ ĐÚNG</div>
+            </div>
+            <div class="stat-card">
+                <div class="val" id="stat-correct" style="color:var(--success);">0/0</div>
+                <div class="lbl">CÂU ĐÚNG</div>
+            </div>
+            <div class="stat-card">
+                <div class="val" id="stat-combo" style="color:#FF9F43;">0</div>
+                <div class="lbl">COMBO TỐI ĐA</div>
+            </div>
+            <div class="stat-card">
+                <div class="val" id="stat-time" style="color:var(--purple);">00:00</div>
+                <div class="lbl">THỜI GIAN</div>
+            </div>
+        </div>
+
+        <!-- Thống kê chi tiết theo chủ đề -->
+        <h3 style="color: var(--dark); margin-top: 20px;">📊 Thống kê năng lực theo Chủ đề:</h3>
+        <table class="topic-table">
+            <thead>
+                <tr>
+                    <th>Tên Chủ Đề IC3 Spark Level 1</th>
+                    <th style="text-align: center;">Số câu hỏi</th>
+                    <th style="text-align: center;">Đúng</th>
+                    <th style="text-align: center;">Tỷ lệ đạt</th>
+                </tr>
+            </thead>
+            <tbody id="topic-stats-body"></tbody>
+        </table>
+
+        <!-- Nhóm nút thao tác -->
+        <div class="btn-action-group" style="margin-top: 25px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn-primary" onclick="resetGame()" style="font-size: 16px; padding: 12px 28px;">🔄 Thi Đấu Lại</button>
+            <button class="btn-primary" onclick="showLeaderboardModal()" style="background: var(--purple); font-size: 16px; padding: 12px 28px; box-shadow: 0 8px 20px rgba(155, 89, 182, 0.3);">🏆 Bảng Xếp Hạng</button>
+            <button class="btn-primary" onclick="window.print()" style="background: var(--dark); font-size: 16px; padding: 12px 28px; box-shadow: none;">🖨️ In Kết Quả</button>
+        </div>
+    </div>
+
+    <!-- MODAL BẢNG XẾP HẠNG LƯU ĐIỂM -->
+    <div id="leaderboard-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; justify-content: center; align-items: center; padding: 15px;">
+        <div style="background: white; border-radius: 20px; max-width: 650px; width: 100%; padding: 25px; max-height: 85vh; overflow-y: auto; border: 4px solid var(--purple);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="color: var(--purple);">🏆 BẢNG VÀNG ĐẤU TRƯỜNG</h2>
+                <button onclick="closeLeaderboardModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">❌</button>
+            </div>
+            
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Hạng</th>
+                        <th>Học sinh</th>
+                        <th>Lớp</th>
+                        <th>Điểm</th>
+                        <th>Tỷ lệ đúng</th>
+                        <th>Thời gian</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-tbody"></tbody>
+            </table>
+
+            <div style="margin-top: 20px; text-align: right; display: flex; justify-content: space-between;">
+                <button onclick="clearLeaderboard()" style="background: none; border: none; color: var(--danger); font-weight: bold; cursor: pointer; text-decoration: underline;">🗑️ Xóa Lịch Sử Lưu Điểm</button>
+                <button onclick="closeLeaderboardModal()" class="btn-primary" style="font-size: 14px; padding: 8px 20px;">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Audio Synthesizer
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'wrong') {
+            osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(174.61, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+    }
+
+    // Bộ câu hỏi IC3 GS6 Spark Level 1 đầy đủ phân theo Chủ đề
+    const questionsDatabase = [
+        // CHỦ ĐỀ 1: CĂN BẢN VỀ CÔNG NGHỆ
+        { topic: "Căn Bản Về Công Nghệ", q: "Em hãy cho biết, hình ảnh nào sau đây là một chiếc Máy tính xách tay (Laptop)?", options: ["Thiết bị dạng bảng cảm ứng", "Điện thoại thông minh", "Máy tính để bàn thùng đứng", "Máy tính gập gọn tích hợp bàn phím và bàn di chuột"], answer: 3, exp: "Laptop là máy tính di động tích hợp màn hình, bàn phím và bàn di chuột." },
+        { topic: "Căn Bản Về Công Nghệ", q: "Em cần kết nối máy tính bảng với Internet. Em nên sử dụng phương tiện gì dưới đây?", options: ["Monitor Cable", "Bluetooth", "Wi-Fi", "Printer Cable"], answer: 2, exp: "Wi-Fi là kết nối không dây phổ biến để truy cập Internet trên máy tính bảng." },
+        { topic: "Căn Bản Về Công Nghệ", q: "Hai thiết bị nào sau đây là thiết bị ngoại vi của máy tính?", options: ["Chuột và Bàn phím", "Sạc pin và Thùng CPU", "RAM và CPU", "Màn hình cảm ứng tích hợp"], answer: 0, exp: "Chuột và bàn phím là các thiết bị ngoại vi cắm ngoài." },
+        { topic: "Căn Bản Về Công Nghệ", q: "Phần mềm nào sau đây là một Hệ Điều Hành (Operating System)?", options: ["Apple iPad", "Google", "Microsoft Windows", "Microsoft Word"], answer: 2, exp: "Microsoft Windows là hệ điều hành dành cho máy tính." },
+        { topic: "Căn Bản Về Công Nghệ", q: "Tùy chọn nào là nơi an toàn để sạc điện thoại di động?", options: ["Dưới gối nằm", "Trên kệ phòng tắm", "Trên bàn làm việc", "Trực tiếp trên sàn nhà đi lại"], answer: 2, exp: "Sạc trên bàn làm việc thoáng mát giúp tránh nguy cơ cháy nổ." },
+
+        // CHỦ ĐỀ 2: CÔNG DÂN SỐ
+        { topic: "Công Dân Số", q: "Một công dân kỹ thuật số tiêu cực (Negative Digital Citizen) có thể làm gì?", options: ["Báo cáo đe doạ trực tuyến cho người lớn", "Viết bình luận gây tổn thương về ai đó trực tuyến", "Bảo vệ thông tin cá nhân", "Xin phép trước khi đăng ảnh bạn"], answer: 1, exp: "Đăng bình luận xúc phạm người khác là hành vi của công dân số tiêu cực." },
+        { topic: "Công Dân Số", q: "Hành vi sử dụng công nghệ để quấy rối, đe dọa hoặc làm người khác xấu hổ được gọi là gì?", options: ["Là người ngoài cuộc", "Bắt nạt trên mạng (Cyberbullying)", "Trolling", "Chơi game trực tuyến"], answer: 1, exp: "Cyberbullying là hành vi bắt nạt qua mạng xã hội/kênh kỹ thuật số." },
+        { topic: "Công Dân Số", q: "Những nội dung nào thuộc Dấu chân kỹ thuật số (Digital Footprint) của em?", options: ["Bình luận của em, Email đã gửi, Ảnh đã đăng lên mạng", "Suy nghĩ chưa nói ra của em", "Chiều cao và cân nặng thực tế", "Sách giấy em đọc ở thư viện"], answer: 0, exp: "Dấu chân kỹ thuật số gồm mọi thông tin bạn để lại trên môi trường mạng." },
+
+        // CHỦ ĐỀ 3: QUẢN LÝ THÔNG TIN
+        { topic: "Quản Lý Thông Tin", q: "Trên trình duyệt Web, em gõ URL của một trang web vào đâu?", options: ["Thanh địa chỉ (Address Bar)", "Thanh trạng thái", "Nút đóng cửa sổ", "Khung tìm kiếm hình ảnh"], answer: 0, exp: "Thanh địa chỉ (Address Bar) ở đầu trình duyệt dùng để nhập URL." },
+        { topic: "Quản Lý Thông Tin", q: "Cách nhanh nhất để lưu trang Web yêu thích để quay lại sau này?", options: ["Viết URL ra sổ tay", "Chụp ảnh màn hình", "Tạo dấu trang (Bookmark / Favorite)", "Ghi nhớ trong đầu"], answer: 2, exp: "Bookmark giúp lưu liên kết web truy cập lại nhanh chóng." },
+        { topic: "Quản Lý Thông Tin", q: "Phát biểu nào sau đây thể hiện một Ý KIẾN (Opinion) thay vì Thực Tế (Fact)?", options: ["Cá sống dưới đại dương", "Đại dương rất tối tăm và đáng sợ", "Đại dương chứa nước mặn", "Có nhiều loài sinh vật biển"], answer: 1, exp: "'Đáng sợ' là cảm nhận chủ quan (Ý kiến)." },
+
+        // CHỦ ĐỀ 4: SÁNG TẠO NỘI DUNG
+        { topic: "Sáng Tạo Nội Dung", q: "Em nên nhấn phím nào trên bàn phím để bắt đầu một đoạn văn mới?", options: ["Caps Lock", "Enter / Return", "Tab", "Esc"], answer: 1, exp: "Phím Enter kết thúc đoạn văn và chuyển sang dòng mới." },
+        { topic: "Sáng Tạo Nội Dung", q: "Tổ hợp phím nào dùng để chọn toàn bộ văn bản (Select All) trong tài liệu?", options: ["Shift + A", "Ctrl + A", "Alt + A", "Tab + A"], answer: 1, exp: "Ctrl + A là phím tắt chuẩn chọn toàn bộ đối tượng/văn bản." },
+
+        // CHỦ ĐỀ 5: TRUYỀN THÔNG
+        { topic: "Truyền Thông", q: "Địa chỉ Email của người nhận thư cần được gõ vào trường nào?", options: ["Ô 'To' (Gửi tới)", "Ô 'Subject' (Chủ đề)", "Ô 'Cc'", "Nội dung thư"], answer: 0, exp: "Trường 'To' dùng để điền địa chỉ Email người nhận." },
+        { topic: "Truyền Thông", q: "Nếu muốn nhắn tin báo cho bạn biết em đang đến muộn, cách nào nhanh nhất?", options: ["Gửi thư điện tử (Email)", "Gửi tin nhắn văn bản (SMS/Text)", "Viết thư tay gửi bưu điện", "Đăng bài viết lên diễn đàn"], answer: 1, exp: "Tin nhắn SMS/Text phản hồi tức thì, thích hợp thông báo khẩn." },
+
+        // CHỦ ĐỀ 6: AN TOÀN VÀ BẢO MẬT
+        { topic: "An Toàn & Bảo Mật", q: "Mật khẩu nào dưới đây là MẬT KHẨU MẠNH (Strong Password)?", options: ["12345678", "password", "W3*ud28x", "nguyenvana"], answer: 2, exp: "Mật khẩu mạnh chứa chữ hoa, chữ thường, số và ký tự đặc biệt." },
+        { topic: "An Toàn & Bảo Mật", q: "Thông tin cá nhân nào em KHÔNG NÊN chia sẻ công khai trên mạng?", options: ["Màu sắc yêu thích", "Tên con vật yêu thích", "Địa chỉ nhà riêng và số điện thoại", "Món ăn ưa thích"], answer: 2, exp: "Địa chỉ nhà và số điện thoại là dữ liệu riêng tư nhạy cảm." }
+    ];
+
+    // Dữ liệu ứng dụng
+    let playerData = { name: "", studentClass: "", school: "", avatar: "🧙‍♂️" };
+    let currentQ = 0;
+    let score = 0;
+    let combo = 0;
+    let maxCombo = 0;
+    let correctCount = 0;
+    let playerHp = 100;
+    let bossHp = 100;
+    let timerInterval = null;
+    let secondsElapsed = 0;
+
+    // Thống kê từng chủ đề
+    let topicStats = {};
+
+    function selectAvatar(el, avatar) {
+        document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
+        el.classList.add('selected');
+        playerData.avatar = avatar;
+    }
+
+    function validateAndStart() {
+        const nameInput = document.getElementById('player-name').value.trim();
+        const classInput = document.getElementById('player-class').value.trim();
+        const schoolInput = document.getElementById('player-school').value.trim();
+
+        if (!nameInput || !classInput) {
+            alert('⚠️ Vui lòng nhập đầy đủ Họ và tên & Lớp của em trước khi vào chơi!');
+            return;
+        }
+
+        playerData.name = nameInput;
+        playerData.studentClass = classInput;
+        playerData.school = schoolInput || "Trường Tiểu Học";
+
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        document.getElementById('display-player-name').innerText = playerData.name;
+        document.getElementById('player-avatar').innerText = playerData.avatar;
+
+        startTimer();
+        initTopicStats();
+        loadQuestion();
+    }
+
+    function startTimer() {
+        secondsElapsed = 0;
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            document.getElementById('timer').innerText = `${mins}:${secs}`;
+        }, 1000);
+    }
+
+    function initTopicStats() {
+        topicStats = {};
+        questionsDatabase.forEach(q => {
+            if (!topicStats[q.topic]) {
+                topicStats[q.topic] = { total: 0, correct: 0 };
+            }
+            topicStats[q.topic].total++;
+        });
+    }
+
+    function loadQuestion() {
+        const qData = questionsDatabase[currentQ];
+        document.getElementById('q-topic').innerText = qData.topic;
+        document.getElementById('q-text').innerText = qData.q;
+        document.getElementById('q-progress').innerText = `${currentQ + 1}/${questionsDatabase.length}`;
+        document.getElementById('stage-title').innerText = qData.topic;
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+
+        qData.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<strong>${String.fromCharCode(65 + idx)}.</strong> ${opt}`;
+            btn.onclick = () => checkAnswer(idx);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedIdx) {
+        const qData = questionsDatabase[currentQ];
+        const buttons = document.querySelectorAll('.option-btn');
+        const feedback = document.getElementById('feedback-box');
+
+        buttons.forEach(btn => btn.style.pointerEvents = 'none');
+
+        if (selectedIdx === qData.answer) {
+            playSound('correct');
+            buttons[selectedIdx].classList.add('correct');
+            score += 100 + (combo * 20);
+            combo++;
+            if (combo > maxCombo) maxCombo = combo;
+            correctCount++;
+            topicStats[qData.topic].correct++;
+
+            bossHp = Math.max(0, bossHp - (100 / questionsDatabase.length));
+            feedback.style.background = '#D4EDDA';
+            feedback.style.color = '#155724';
+            feedback.innerHTML = `🎉 <strong>Chính xác!</strong> ${qData.exp}`;
+        } else {
+            playSound('wrong');
+            buttons[selectedIdx].classList.add('wrong');
+            buttons[qData.answer].classList.add('correct');
+            combo = 0;
+            playerHp = Math.max(0, playerHp - 8);
+            feedback.style.background = '#F8D7DA';
+            feedback.style.color = '#721C24';
+            feedback.innerHTML = `❌ <strong>Chưa chính xác!</strong> ${qData.exp}`;
+        }
+
+        document.getElementById('score').innerText = score;
+        document.getElementById('combo').innerText = combo;
+        document.getElementById('player-hp').style.width = playerHp + '%';
+        document.getElementById('boss-hp').style.width = bossHp + '%';
+
+        feedback.style.display = 'block';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < questionsDatabase.length) {
+            loadQuestion();
+        } else {
+            finishGame();
+        }
+    }
+
+    function finishGame() {
+        clearInterval(timerInterval);
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+
+        const accuracyPct = Math.round((correctCount / questionsDatabase.length) * 100);
+        const timeFormatted = document.getElementById('timer').innerText;
+
+        // Cập nhật thẻ kết quả
+        document.getElementById('cert-avatar').innerText = playerData.avatar;
+        document.getElementById('cert-name').innerText = playerData.name;
+        document.getElementById('cert-info').innerText = `Lớp: ${playerData.studentClass} | ${playerData.school}`;
+        
+        // Tính Xếp loại
+        let rankText = "CẦN CỐ GẮNG";
+        let rankClass = "rank-bronze";
+        if (accuracyPct >= 90) { rankText = "XUẤT SẮC (IC3 SPARK MASTER)"; rankClass = "rank-master"; }
+        else if (accuracyPct >= 75) { rankText = "GIỎI"; rankClass = "rank-gold"; }
+        else if (accuracyPct >= 50) { rankText = "KHÁ"; rankClass = "rank-silver"; }
+
+        const badgeEl = document.getElementById('cert-rank-badge');
+        badgeEl.innerText = rankText;
+        badgeEl.className = `badge-rank ${rankClass}`;
+
+        // Cập nhật các ô chỉ số
+        document.getElementById('stat-score').innerText = score;
+        document.getElementById('stat-accuracy').innerText = `${accuracyPct}%`;
+        document.getElementById('stat-correct').innerText = `${correctCount}/${questionsDatabase.length}`;
+        document.getElementById('stat-combo').innerText = maxCombo;
+        document.getElementById('stat-time').innerText = timeFormatted;
+
+        // Render bảng thống kê chủ đề
+        const tbody = document.getElementById('topic-stats-body');
+        tbody.innerHTML = '';
+        for (const [topicName, data] of Object.entries(topicStats)) {
+            const pct = Math.round((data.correct / data.total) * 100);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${topicName}</strong></td>
+                <td style="text-align:center;">${data.total}</td>
+                <td style="text-align:center; color:var(--success); font-weight:bold;">${data.correct}</td>
+                <td style="text-align:center;"><span style="background:${pct>=70?'#D4EDDA':'#F8D7DA'}; color:${pct>=70?'#155724':'#721C24'}; padding:3px 10px; border-radius:12px; font-weight:bold;">${pct}%</span></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        // Lưu dữ liệu vào LocalStorage
+        saveToLeaderboard({
+            name: playerData.name,
+            studentClass: playerData.studentClass,
+            score: score,
+            accuracy: accuracyPct,
+            time: timeFormatted,
+            date: new Date().toLocaleDateString('vi-VN')
+        });
+    }
+
+    // Quản lý Bảng Xếp Hạng LocalStorage
+    function saveToLeaderboard(record) {
+        let board = JSON.parse(localStorage.getItem('ic3_spark_leaderboard') || '[]');
+        board.push(record);
+        // Sắp xếp giảm dần theo Điểm, sau đó theo Tỷ lệ đúng
+        board.sort((a, b) => b.score - a.score || b.accuracy - a.accuracy);
+        localStorage.setItem('ic3_spark_leaderboard', JSON.stringify(board));
+    }
+
+    function showLeaderboardModal() {
+        const modal = document.getElementById('leaderboard-modal');
+        const tbody = document.getElementById('leaderboard-tbody');
+        let board = JSON.parse(localStorage.getItem('ic3_spark_leaderboard') || '[]');
+
+        tbody.innerHTML = '';
+        if (board.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6">Chưa có dữ liệu lưu điểm. Hãy hoàn thành bài thi đầu tiên!</td></tr>`;
+        } else {
+            board.slice(0, 15).forEach((item, index) => {
+                const tr = document.createElement('tr');
+                let rankIcon = index + 1;
+                if (index === 0) rankIcon = '🥇';
+                else if (index === 1) rankIcon = '🥈';
+                else if (index === 2) rankIcon = '🥉';
+
+                tr.innerHTML = `
+                    <td style="font-size:16px;"><strong>${rankIcon}</strong></td>
+                    <td style="font-weight:bold; text-align:left;">${item.name}</td>
+                    <td>${item.studentClass}</td>
+                    <td style="color:var(--primary); font-weight:bold;">${item.score}</td>
+                    <td>${item.accuracy}%</td>
+                    <td>${item.time}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        modal.style.display = 'flex';
+    }
+
+    function closeLeaderboardModal() {
+        document.getElementById('leaderboard-modal').style.display = 'none';
+    }
+
+    function clearLeaderboard() {
+        if (confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử điểm số không?')) {
+            localStorage.removeItem('ic3_spark_leaderboard');
+            showLeaderboardModal();
+        }
+    }
+
+    function resetGame() {
+        currentQ = 0;
+        score = 0;
+        combo = 0;
+        maxCombo = 0;
+        correctCount = 0;
+        playerHp = 100;
+        bossHp = 100;
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('start-screen').style.display = 'block';
+    }
+</script>
+</body>
+</html>
